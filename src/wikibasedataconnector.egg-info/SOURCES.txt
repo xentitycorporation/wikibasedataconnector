@@ -1,0 +1,9 @@
+LICENSE
+README.md
+pyproject.toml
+src/wikibasedataconnector/__init__.py
+src/wikibasedataconnector/wikibasedataconnector.py
+src/wikibasedataconnector.egg-info/PKG-INFO
+src/wikibasedataconnector.egg-info/SOURCES.txt
+src/wikibasedataconnector.egg-info/dependency_links.txt
+src/wikibasedataconnector.egg-info/top_level.txt

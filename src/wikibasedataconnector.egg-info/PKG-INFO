@@ -1,0 +1,15 @@
+Metadata-Version: 2.1
+Name: wikibasedataconnector
+Version: 0.0.1
+Author-email: Xentity Corporation <contact@xentity.com>
+Project-URL: Homepage, https://github.com/xentitycorporation/wikibasedataconnector
+Project-URL: Bug Tracker, https://github.com/xentitycorporation/wikibasedataconnector/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# wikibasedataconnector
+Library used for mapping data easily into Wikibase Systems
