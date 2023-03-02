@@ -14,4 +14,7 @@ response.json
 .vscode
 **/*.pyc
 **/*.zip
-**/mrds.csv
+build/
+lib/
+dist/
+
