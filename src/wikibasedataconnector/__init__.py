@@ -1,0 +1,1 @@
+from .wikibasedataconnector import WBDC
