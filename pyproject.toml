@@ -12,6 +12,11 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
+dependencies = [
+    "requests>=2.28.2",
+    "wikitextparser>=0.51.1",
+    "pywikibot>=8.0.0"
+]
 
 [project.urls]
 "Homepage" = "https://github.com/xentitycorporation/wikibasedataconnector"
