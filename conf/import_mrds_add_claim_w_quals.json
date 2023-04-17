@@ -1,0 +1,110 @@
+{
+    "source": {
+        "format": "csv",
+        "method": "s3",
+        "type": "item",
+        "location": {
+            "bucket": "nb-scripts",
+            "file": "data/mrds_subset.csv"
+        },
+        "skipHeader": true,
+        "upsert": {
+            "matchType": "id",
+            "idx": 2
+        }
+    },
+    "reference": [
+        {
+            "config": {
+                "value": "P10"
+            },
+            "idx": -1,
+            "type": "url",
+            "value": "https://www.geoplatform.gov/metadata/dfc79b01-b942-554d-81a6-a0a073ec677c"
+        },
+        {
+            "config": {
+                "value": "P4"
+            },
+            "idx": 1,
+            "type": "url"
+        }
+    ],
+    "mapping": [
+        {
+            "idx": 27,
+            "type": "aliases"
+        },
+        {
+            "idx": 1,
+            "type": "claim",
+            "config": {
+                "value": "P6"
+            },
+            "targets": [
+                {
+                    "idx": 0,
+                    "type": "string",
+                    "qualifiers": [
+                        {
+                            "idx": -1,
+                            "property": "P9",
+                            "type": "string",
+                            "value": "This is a literal"
+                        },
+                        {
+                            "idx": 8,
+                            "property": "P5",
+                            "type": "wikibase-item"
+                        },
+                        {
+                            "idx": 29,
+                            "property": "P12",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "idx": 11,
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        },
+        {
+            "type": "claim",
+            "config": {
+                "value": "P7"
+            },
+            "targets": [
+                {
+                    "lat": {
+                        "idx": 5
+                    },
+                    "lon": {
+                        "idx": 6
+                    },
+                    "type": "globe-coordinate",
+                    "qualifiers": [
+                        {
+                            "idx": -1,
+                            "property": "P9",
+                            "type": "string",
+                            "value": "This is another literal"
+                        },
+                        {
+                            "idx": 8,
+                            "property": "P5",
+                            "type": "wikibase-item"
+                        },
+                        {
+                            "idx": 29,
+                            "property": "P12",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

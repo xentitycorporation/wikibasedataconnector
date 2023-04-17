@@ -1,0 +1,124 @@
+{
+    "source": {
+        "skipHeader": false,
+        "type": "item",
+        "upsert": {
+            "matchType": "label",
+            "idx": "county"
+        }
+    },
+    "reference": [
+        {
+            "config": {
+                "value": "P13"
+            },
+            "idx": -1,
+            "type": "url",
+            "value": "https://data.colorado.gov/resource/ahgn-r8s5.json"
+        }
+    ],
+    "mapping": [
+        {
+            "idx": "county",
+            "type": "label"
+        },
+        {
+            "idx": -1,
+            "type": "description",
+            "config": {
+                "value": "this is the desc"
+            }
+        },
+        {
+            "type": "claim",
+            "config": {
+                "value": "P15"
+            },
+            "targets": [
+                {
+                    "idx": "co_fips",
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        },
+        {
+            "type": "claim",
+            "config": {
+                "value": "P16"
+            },
+            "targets": [
+                {
+                    "idx": "pop_2010",
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        },
+        {
+            "type": "claim",
+            "config": {
+                "value": "P17"
+            },
+            "targets": [
+                {
+                    "idx": "househo_20",
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        },
+        {
+            "type": "claim",
+            "config": {
+                "value": "P18"
+            },
+            "targets": [
+                {
+                    "idx": "shape_star",
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        },
+        {
+            "type": "claim",
+            "config": {
+                "value": "P19"
+            },
+            "targets": [
+                {
+                    "idx": "shape_stle",
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        },
+        {
+            "type": "claim",
+            "config": {
+                "value": "P20"
+            },
+            "targets": [
+                {
+                    "idx": "shape_st_1",
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        },
+        {
+            "type": "claim",
+            "config": {
+                "value": "P21"
+            },
+            "targets": [
+                {
+                    "idx": "shape_st_2",
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        }
+    ]
+}
