@@ -1,0 +1,26 @@
+{
+	"source": {
+		"format": "csv",
+		"method": "s3",
+		"type": "property",
+		"upsert": {
+            "matchType": "label",
+            "idx": 0
+        },
+		"skipHeader": false
+	},
+    "mapping": [
+		{
+			"idx": 0,
+			"type": "label"
+		},
+		{
+			"idx": 1,
+			"type": "description"
+		},
+		{
+			"idx": 2,
+			"type": "datatype"
+		}
+	]
+}

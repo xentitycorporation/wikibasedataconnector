@@ -1,0 +1,52 @@
+{
+    "source": {
+        "format": "csv",
+        "method": "s3",
+        "type": "item",
+        "location": {
+            "bucket": "nb-scripts",
+            "file": "data/mrds_subset.csv"
+        },
+        "skipHeader": true,
+        "upsert": {
+            "matchType": "label",
+            "idx": 4
+        }
+    },
+    "reference": [
+        {
+            "config": {
+                "value": "P10"
+            },
+            "idx": -1,
+            "type": "url",
+            "value": "https://geoplatform.maps.arcgis.com/home/index.html"
+        },
+        {
+            "config": {
+                "value": "P4"
+            },
+            "idx": 1,
+            "type": "url"
+        }
+    ],
+    "mapping": [
+        {
+            "idx": 1,
+            "type": "claim",
+            "config": {
+                "value": "P6"
+            },
+            "targets": [
+                {
+                    "idx": 0,
+                    "type": "string"
+                },
+                {
+                    "idx": 11,
+                    "type": "string"
+                }
+            ]
+        }
+    ]
+}

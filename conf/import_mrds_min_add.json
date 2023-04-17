@@ -1,0 +1,41 @@
+{
+    "source": {
+        "format": "csv",
+        "method": "s3",
+        "type": "item",
+        "location": {
+            "bucket": "nb-scripts",
+            "file": "data/mrds_subset.csv"
+        },
+        "skipHeader": true,
+        "upsert": {
+            "matchType": "label",
+            "idx": 4
+        }
+    },
+    "reference": [
+        {
+            "idx": -1,
+            "type": "url",
+            "value": "https://www.geoplatform.gov/metadata/dfc79b01-b942-554d-81a6-a0a073ec677c"
+        },
+        {
+            "idx": 1,
+            "type": "url",
+            "value": "https://mrdata.usgs.gov/mrds/show-mrds.php?dep_id=10000001"
+        }
+    ],
+    "mapping": [
+        {
+            "idx": 4,
+            "type": "label"
+        },
+        {
+            "idx": -1,
+            "type": "description",
+            "config": {
+                "value": "this is the desc"
+            }
+        }
+    ]
+}

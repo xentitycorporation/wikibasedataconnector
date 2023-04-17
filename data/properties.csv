@@ -1,0 +1,15 @@
+label,description,datatype,wikidata_property,clone_from_wikidata
+instance of,this item is a class of that item;type of the item,wikibase-item,P31,0
+subclass of,this item is a subclass (subset) of that item,wikibase-item,P279,0
+coordinate location,a geographic point indicating the location of an entity on the earth's surface,globe-coordinate,P625,0
+reference item,a knowledgebase item that serves as the source reference for a statement,wikibase-item,,0
+reference url,a web link provided as the source reference for a statement;used when no viable item is available,url,,0
+reference statement,a short statement about the source for a claiml;used when no viable item or URL is available,string,,0
+publication date,date or point in time when a work represented by a knowledgebase item was first published or released,time,P577,0
+subject matter,topic or subject addressed by the item,wikibase-item,P921,0
+ranking,used as statement qualifier indicating relative ranking,quantity,P1352,0
+country,,wikibase-item,,0
+state,,wikibase-item,,0
+coordinates,,globe-coordinate,,0
+mrds ID,Unique identifier given within the MRDS dataset,string,,0
+deposit ID,Unique identifier provided by the MRDS dataset,string,,0

@@ -1,0 +1,47 @@
+{
+    "source": {
+        "skipHeader": true,
+        "type": "item",
+        "upsert": {
+            "matchType": "label",
+            "idx": 1
+        }
+    },
+    "reference": [
+        {
+            "config": {
+                "value": "P13"
+            },
+            "idx": -1,
+            "type": "url",
+            "value": "https://www.geoplatform.gov/metadata/dfc79b01-b942-554d-81a6-a0a073ec677c"
+        }
+    ],
+    "mapping": [
+        {
+            "idx": 1,
+            "type": "label"
+        },
+        {
+            "idx": -1,
+            "type": "description",
+            "config": {
+                "value": "this is the desc"
+            }
+        },
+        {
+            "idx": 4,
+            "type": "claim",
+            "config": {
+                "value": "P6"
+            },
+            "targets": [
+                {
+                    "idx": 4,
+                    "type": "string",
+                    "qualifiers": []
+                }
+            ]
+        }
+    ]
+}

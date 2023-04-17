@@ -1,0 +1,30 @@
+{
+	"source": {
+		"format": "csv",
+		"method": "s3",
+		"type": "item",
+		"location": {
+			"bucket": "nb-scripts",
+			"file": "data/items.csv"
+		},
+		"skipHeader": true,
+		"upsert": {
+            "matchType": "label",
+            "idx": 0
+        }
+	},
+    "mapping": [
+        {
+            "idx": 0,
+            "type": "label"
+        },
+        {
+            "idx": 1,
+            "type": "description"
+        },
+        {
+            "idx": 2,
+            "type": "aliases"
+        }
+    ]
+}
