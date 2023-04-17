@@ -78,5 +78,6 @@ Note: If you are on Windows, instructions to add the path can be found [here](ht
 
     you can test to see if pywikibot is working by running the command `pwb`
 
-License
+### License
+
 This library is released under the MIT License. Please refer to the LICENSE file for more information.
