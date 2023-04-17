@@ -16,7 +16,7 @@ import csv
 import asyncio
 from wikibasedataconnector import WBDC
 
-conf_filepath = '../../conf'
+conf_filepath = 'conf'
 site_name = <SITE>
 PATH = f'{conf_filepath}/import_properties_add.json'
 with open(PATH, 'r', encoding='utf-8') as f:
@@ -25,7 +25,7 @@ with open(PATH, 'r', encoding='utf-8') as f:
 bot = WBDC(site_name)
 bot.set_mapping_config(mapping_config)
 
-FILEPATH = '../../data/properties.csv'
+FILEPATH = 'data/properties.csv'
 with open(FILEPATH, 'r', encoding='utf-8') as file:
     csv_file = csv.reader(file)
     next(csv_file)
@@ -34,7 +34,7 @@ with open(FILEPATH, 'r', encoding='utf-8') as file:
 This code will read and process the `properties.csv` file according to the `import_properties_add.json` configuration file. 
 More examples can be found in `example/example_upsert.ipynb`.
 
-Note that this uses the Pywikibot library, so it is required to create a family file and generated user files if you're using a custom wikibase.
+This uses the Pywikibot library, so it is required to create a family file and generated user files if you're using a custom wikibase.
 
 ### To create family and user files
 
@@ -72,8 +72,9 @@ It is possible that the path was not added to the environment. If that is the ca
         Consider adding this directory to PATH or, if you prefer to suppress this warning, use --no-warn-script-location.
     ```
 
-    You can add the path by running `export PATH=$PATH:/some/new/path` 
-        Note: If you are on Windows, instructions to add the path can be found [here](https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14))
+You can add the path by running `export PATH=$PATH:/some/new/path` 
+
+Note: If you are on Windows, instructions to add the path can be found [here](https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14))
 
     you can test to see if pywikibot is working by running the command `pwb`
 
