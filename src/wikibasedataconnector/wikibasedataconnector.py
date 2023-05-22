@@ -2,8 +2,10 @@
 """
 import json
 from typing import Optional, Union
-import requests
+
 import pywikibot as pwb
+import requests
+
 
 class WBDC:
     """
@@ -18,7 +20,7 @@ class WBDC:
         self.sparql_endpoint = None
         self.site.login()
 
-    def __add_item(self, page_info: dict, row: list) -> str:
+    def __add_item(self, page_info: dict, row: list, summary) -> str:
         """Generate new Item in GSKB
 
         Args:
@@ -57,6 +59,7 @@ class WBDC:
             'new': 'item',
             'data': json.dumps(data),
             'token': self.site.tokens['csrf'],
+            'summary': summary
         }
         try:
             req = self.site.simple_request(**params)
@@ -66,7 +69,7 @@ class WBDC:
             print(f'Failed to insert item {label}')
             print(exc)
 
-    def __add_prop(self, page_info: dict, row:list) -> Optional[str]:
+    def __add_prop(self, page_info: dict, row:list, summary) -> Optional[str]:
         """Generate new property in GSKB
 
         Args:
@@ -110,7 +113,7 @@ class WBDC:
             'action': 'wbeditentity',
             'new': 'property',
             'data': json.dumps(data),
-            'summary': 'bot adding in properties',
+            'summary': summary,
             'token': self.site.tokens['csrf']
         }
         try:
@@ -217,11 +220,12 @@ class WBDC:
             raise ValueError('Mapping is required')
         src = self.mapping_conf['source']
         page_info = self.mapping_conf['mapping']
+        summary = src['summary']
         if src['type'] == 'property':
             label = row[src['upsert']['idx']]
             prop_id = self.__search_item_id(label, src['type'])
             if prop_id is None:
-                prop_id = self.__add_prop(page_info, row)
+                prop_id = self.__add_prop(page_info, row, summary)
             self.__create_page(prop_id)
         elif src['upsert']['matchType'] == 'id':
             unique_id = row[src['upsert']['idx']]
@@ -231,20 +235,20 @@ class WBDC:
             label = row[src['upsert']['idx']]
             item_id = self.__search_item_id(label, src['type'])
             if item_id is None:
-                item_id = self.__add_item(page_info, row)
+                item_id = self.__add_item(page_info, row, summary)
             self.__create_page(item_id)
         for opt in page_info:
             if opt['type'] == 'label':
                 label = row[opt['idx']]
-                self.__upsert_label(label)
+                self.__upsert_label(label, summary)
             elif opt['type'] == 'description':
                 description = opt['config']['value'] if 'config' in opt else row[opt['idx']]
-                self.__upsert_description(description)
+                self.__upsert_description(description, summary)
             elif opt['type'] == 'aliases':
                 aliases = row[opt['idx']].split(', ') if row[opt['idx']]  != '' else []
-                self.__upsert_aliases(aliases)
+                self.__upsert_aliases(aliases, summary)
             elif opt['type'] == 'claim':
-                self.__upsert_claim(opt, row)
+                self.__upsert_claim(opt, row, summary)
 
     def __search_item_id(self, search_term: str, item_type: str) -> Optional[str]:
         """Makes an API call to find id within the GSKB
@@ -314,7 +318,7 @@ class WBDC:
                 claim.removeSource(claim.sources[i][ref_value][0])
                 self.__add_source(claim, ref, row)
 
-    def __upsert_claim(self, claim_dict: dict, row: list) -> None:
+    def __upsert_claim(self, claim_dict: dict, row: list, summary: str) -> None:
         """Inserts/Updates claims within page
 
         Args:
@@ -328,7 +332,7 @@ class WBDC:
             for target in claim_dict['targets']:
                 claim = pwb.Claim(self.repo, claim_value)
                 self.__set_claim_options(claim, target, row, refs)
-                self.page.addClaim(claim, summary='Adding claim')
+                self.page.addClaim(claim, summary=summary)
         # if claim value found, but target not found
         else:
             for target in claim_dict['targets']:
@@ -344,9 +348,9 @@ class WBDC:
                 if not match_found:
                     new_claim = pwb.Claim(self.repo, claim_value)
                     self.__set_claim_options(new_claim, target, row, refs)
-                    self.page.addClaim(new_claim, summary='Adding claim')
+                    self.page.addClaim(new_claim, summary=summary)
 
-    def __upsert_aliases(self, aliases: str) -> None:
+    def __upsert_aliases(self, aliases: str, summary: str) -> None:
         """Adds or updates a label
 
         Args:
@@ -359,9 +363,9 @@ class WBDC:
         and set(page_dict['aliases']['en']) == set(aliases)
         )
         if not same_aliases:
-            self.page.editAliases({'en': aliases }, summary="Setting aliases")
+            self.page.editAliases({'en': aliases }, summary=summary)
 
-    def __upsert_description(self, desc: str) -> None:
+    def __upsert_description(self, desc: str, summary: str) -> None:
         """Adds or updates a description
 
         Args:
@@ -369,9 +373,9 @@ class WBDC:
         """
         page_dict = self.page.get()
         if desc != page_dict['labels']['en']:
-            self.page.editDescriptions({'en': desc }, summary="Setting description")
+            self.page.editDescriptions({'en': desc }, summary=summary)
 
-    def __upsert_label(self, label: str) -> None:
+    def __upsert_label(self, label: str, summary: str) -> None:
         """Adds or updates a label
 
         Args:
@@ -379,7 +383,7 @@ class WBDC:
         """
         page_dict = self.page.get()
         if label != page_dict['labels']['en']:
-            self.page.editLabels({'en': label }, summary="Setting label")
+            self.page.editLabels({'en': label }, summary=summary)
 
     def __upsert_references(self, claim: pwb.Claim, refs: list, row: list) -> None:
         """Inserts/updates references into Claim
@@ -403,8 +407,8 @@ class WBDC:
                 and value != sources[ref['config']['value']].target):
                 self.__update_link(claim, ref, row)
 
-    def __upsert_qualifier(self, claim: pwb.Claim, qualifier_dict: dict, row: list) -> None:
-        """_summary_
+    def __upsert_qualifier(self, claim: pwb.Claim, qualifier_dict: dict, row: list, summary) -> None:
+        """Inserts/updates qualifier into Claim
 
         Args:
             claim (pwb.Claim): Claim that the qualifier is being added on to
@@ -419,9 +423,9 @@ class WBDC:
         if (qual_claim in claim.qualifiers
              and not claim.qualifiers[qual_claim][0].target_equals(target)):
             claim.removeQualifier(claim.qualifiers[qual_claim][0])
-            claim.addQualifier(qualifier, summary='Adding a qualifier')
+            claim.addQualifier(qualifier, summary=summary)
         elif not claim.has_qualifier(qual_claim, target):
-            claim.addQualifier(qualifier, summary='Adding a qualifier')
+            claim.addQualifier(qualifier, summary=summary)
 
 def wait(self, seconds): # pylint: disable=unused-argument
     """Override to remove default throttle of 5 secs
