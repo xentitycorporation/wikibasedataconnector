@@ -125,7 +125,7 @@ class WBDC:
             print(f'Failed to insert property {label}')
             print(exc)
 
-    def __add_source(self, claim: pwb.Claim, ref: dict, row: list) -> None:
+    def __add_source(self, claim: pwb.Claim, ref: dict, row: list, summary: str) -> None:
         """Add sources to claims on item
 
         Args:
@@ -137,11 +137,11 @@ class WBDC:
         if ref['idx'] == -1:
             source = pwb.Claim(self.repo, prop_value)
             source.setTarget(ref['value'])
-            claim.addSource(source)
+            claim.addSource(source, summary=summary)
         else:
             source = pwb.Claim(self.repo, prop_value)
             source.setTarget(row[ref['idx']])
-            claim.addSource(source)
+            claim.addSource(source, summary=summary)
 
     def __create_page(self, page_id) -> Union[pwb.PropertyPage, pwb.ItemPage]:
         """
@@ -289,7 +289,7 @@ class WBDC:
         """
         self.mapping_conf = mapping
 
-    def __set_claim_options(self, claim: pwb.Claim, target: dict, row: list, refs: dict) -> None:
+    def __set_claim_options(self, claim: pwb.Claim, target: dict, row: list, refs: dict, summary: str) -> None:
         """Add the target and qualifiers to the claim
 
         Args:
@@ -301,11 +301,11 @@ class WBDC:
         claim._type = target['type'] # pylint: disable=protected-access
         determined_target = self.__determine_target(target, row)
         claim.setTarget(determined_target)
-        self.__upsert_references(claim, refs, row)
+        self.__upsert_references(claim, refs, row, summary)
         for qualifier in target['qualifiers']:
-            self.__upsert_qualifier(claim, qualifier, row)
+            self.__upsert_qualifier(claim, qualifier, row, summary)
 
-    def __update_link(self, claim: pwb.Claim, ref: dict, row: list) -> None:
+    def __update_link(self, claim: pwb.Claim, ref: dict, row: list, summary: str) -> None:
         """Updates the url in claim if considered different
 
         Args:
@@ -316,7 +316,7 @@ class WBDC:
             ref_value = ref['config']['value']
             if ref_value in claim.sources[i]:
                 claim.removeSource(claim.sources[i][ref_value][0])
-                self.__add_source(claim, ref, row)
+                self.__add_source(claim, ref, row, summary)
 
     def __upsert_claim(self, claim_dict: dict, row: list, summary: str) -> None:
         """Inserts/Updates claims within page
@@ -331,7 +331,7 @@ class WBDC:
         if claim_value not in claims:
             for target in claim_dict['targets']:
                 claim = pwb.Claim(self.repo, claim_value)
-                self.__set_claim_options(claim, target, row, refs)
+                self.__set_claim_options(claim, target, row, refs, summary)
                 self.page.addClaim(claim, summary=summary)
         # if claim value found, but target not found
         else:
@@ -341,13 +341,13 @@ class WBDC:
                 determined_target = self.__determine_target(target, row)
                 for claim in claims[claim_value]:
                     if claim.target_equals(determined_target):
-                        self.__upsert_references(claim, refs, row)
+                        self.__upsert_references(claim, refs, row, summary)
                         for qualifier in target['qualifiers']:
-                            self.__upsert_qualifier(claim, qualifier, row)
+                            self.__upsert_qualifier(claim, qualifier, row, summary)
                         match_found = True
                 if not match_found:
                     new_claim = pwb.Claim(self.repo, claim_value)
-                    self.__set_claim_options(new_claim, target, row, refs)
+                    self.__set_claim_options(new_claim, target, row, refs, summary)
                     self.page.addClaim(new_claim, summary=summary)
 
     def __upsert_aliases(self, aliases: str, summary: str) -> None:
@@ -385,7 +385,7 @@ class WBDC:
         if label != page_dict['labels']['en']:
             self.page.editLabels({'en': label }, summary=summary)
 
-    def __upsert_references(self, claim: pwb.Claim, refs: list, row: list) -> None:
+    def __upsert_references(self, claim: pwb.Claim, refs: list, row: list, summary: str) -> None:
         """Inserts/updates references into Claim
 
         Args:
@@ -402,10 +402,10 @@ class WBDC:
         for ref in refs:
             value = ref['value'] if ref['idx'] == -1 else row[ref['idx']]
             if ref['config']['value'] not in sources:
-                self.__add_source(claim, ref, row)
+                self.__add_source(claim, ref, row, summary)
             if (ref['config']['value'] in sources
                 and value != sources[ref['config']['value']].target):
-                self.__update_link(claim, ref, row)
+                self.__update_link(claim, ref, row, summary)
 
     def __upsert_qualifier(self, claim: pwb.Claim, qualifier_dict: dict, row: list, summary) -> None:
         """Inserts/updates qualifier into Claim
