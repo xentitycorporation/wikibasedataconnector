@@ -187,7 +187,7 @@ class WBDC:
         if target_dict['type'] == 'string':
             return value
         if target_dict['type'] == 'monolingualtext':
-            value = target_dict['value']
+            value = row[target_dict['idx']]
             lang = target_dict['language'] if 'language' in target_dict else 'en'
             mlt_value = pwb.WbMonolingualText(value, lang)
             return mlt_value
@@ -198,19 +198,19 @@ class WBDC:
         if target_dict['type'] == 'external-id':
             return value
         if target_dict['type'] == 'quantity':
-            value = target_dict['value']
+            value = row[target_dict['idx']]
             amount = target_dict['amount'] if 'amount' in target_dict else None
             # margin of error
             me = target_dict['me'] if 'me' in target_dict else None
             return pwb.WbQuantity(value, amount, me, self.repo)
         if target_dict['type'] == 'time':
-            value = target_dict['value']
+            value = row[target_dict['idx']]
             if '-' in value:
                 value = ''.join(value.split('-'))
             elif '/' in value:
                 value = ''.join(value.split('/'))
-            ts = pwb.Timestamp.fromtimestamp(value)
-            return pwb.WbTime.fromTimestamp(ts)
+            ts = pwb.Timestamp.fromtimestampformat(value)
+            return pwb.WbTime.fromTimestamp(ts, precision=11)
         item_id = self.__search_item_id(value, 'item')
         return pwb.ItemPage(self.repo, item_id)
 
