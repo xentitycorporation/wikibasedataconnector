@@ -1,4 +1,4 @@
-"""wikibot for the GeoScience Knowledgebase
+"""wikibot to Connect to Wikibase Instances
 """
 import json
 from typing import Optional, Union
@@ -156,7 +156,9 @@ class WBDC:
         else:
             self.page = pwb.ItemPage(self.repo, page_id)
 
-    def __determine_target(self, target_dict: dict, row: list) -> Union[pwb.Claim, str, pwb.Coordinate]:
+    def __determine_target(self,
+                            target_dict: dict,
+                            row: list) -> Union[pwb.Claim, str, pwb.Coordinate]:
         """Handle claim's target type
 
         Args:
@@ -177,9 +179,11 @@ class WBDC:
                 precision=0.001,
                 site=self.site
             )
+        src = self.config['source']
+        instance_of = row[src['upsert']['instanceOf']]
         if target_dict['idx'] == -1 and target_dict['type'] == 'wikibase-item':
             value = target_dict['value']
-            item_id = self.__search_item_id(value, 'item')
+            item_id = self.__search_item_id_sparql(value, instance_of)
             return pwb.ItemPage(self.repo, item_id)
         if target_dict['idx'] == -1:
             return target_dict['value']
@@ -211,7 +215,7 @@ class WBDC:
                 value = ''.join(value.split('/'))
             ts = pwb.Timestamp.fromtimestampformat(value)
             return pwb.WbTime.fromTimestamp(ts, precision=11)
-        item_id = self.__search_item_id(value, 'item')
+        item_id = self.__search_item_id_sparql(value, instance_of)
         return pwb.ItemPage(self.repo, item_id)
 
     def __get_item_id(self, unique_id: str) -> Optional[str]:
@@ -248,7 +252,8 @@ class WBDC:
         summary = src['summary']
         if src['type'] == 'property':
             label = row[src['upsert']['idx']]
-            prop_id = self.__search_item_id(label, src['type'])
+            instance_of = row[src['upsert']['instanceOf']]
+            item_id = self.__search_item_id_sparql(label, instance_of)
             if prop_id is None:
                 prop_id = self.__add_prop(page_info, row, summary)
             self.__create_page(prop_id)
@@ -258,7 +263,8 @@ class WBDC:
             self.__create_page(item_id)
         else:
             label = row[src['upsert']['idx']]
-            item_id = self.__search_item_id(label, src['type'])
+            instance_of = row[src['upsert']['instanceOf']]
+            item_id = self.__search_item_id_sparql(label, instance_of)
             if item_id is None:
                 item_id = self.__add_item(page_info, row, summary)
             self.__create_page(item_id)
@@ -276,7 +282,7 @@ class WBDC:
                 self.__upsert_claim(opt, row, summary)
 
     def __search_item_id(self, search_term: str, item_type: str) -> Optional[str]:
-        """Makes an API call to find id within the GSKB
+        """Makes an API call to find id within the GeoKB
 
         Args:
             item (dict): item attributes in key/value pairs
@@ -297,6 +303,37 @@ class WBDC:
               if len(results['search']) > 0 and 'id' in results['search'][0]
               else None)
 
+    def __search_item_id_sparql(self, search_term: str, instance_of: str):
+        """Makes an API call to the SPARQL endpoint to find id within the GeoKB
+
+        Args:
+            item (dict): item attributes in key/value pairs
+
+        Returns:
+            Optional[str]: Either the item QID or None if it doesn't exist
+        """
+        search_term = search_term.lower()
+        query = '' \
+        ' PREFIX wdt: <https://geokb.wikibase.cloud/prop/direct/>' \
+        ' PREFIX wd: <https://geokb.wikibase.cloud/entity/>' \
+        ' SELECT ?item WHERE {' \
+        ' ?item rdfs:label ?label ;' \
+        f'      wdt:P1 wd:{instance_of}' \
+        f' FILTER CONTAINS( LCASE(?label), "{search_term}") .' \
+        '}'
+        params = {
+            'query': query,
+            'format': 'json'
+        }
+        res = requests.get(self.sparql_endpoint, params=params, timeout=100)
+        json_res =res.json()
+        item_result = (json_res['results']['bindings'][0]['item']['value']
+            if 'results' in json_res
+            and len(json_res['results']['bindings']) > 0
+            and 'item' in json_res['results']['bindings'][0]
+            else None)
+        return item_result.split('/')[-1] if item_result is not None else None
+
     def set_config(self, settings: dict) -> None:
         """Provide endpoints needed to add to wikibase
 
@@ -314,7 +351,12 @@ class WBDC:
         """
         self.mapping_conf = mapping
 
-    def __set_claim_options(self, claim: pwb.Claim, target: dict, row: list, refs: dict, summary: str) -> None:
+    def __set_claim_options(self,
+                            claim: pwb.Claim,
+                            target: dict,
+                            row: list,
+                            refs: dict,
+                            summary: str) -> None:
         """Add the target and qualifiers to the claim
 
         Args:
@@ -432,7 +474,10 @@ class WBDC:
                 and value != sources[ref['config']['value']].target):
                 self.__update_link(claim, ref, row, summary)
 
-    def __upsert_qualifier(self, claim: pwb.Claim, qualifier_dict: dict, row: list, summary) -> None:
+    def __upsert_qualifier(self, claim: pwb.Claim,
+                            qualifier_dict: dict,
+                            row: list,
+                            summary:str) -> None:
         """Inserts/updates qualifier into Claim
 
         Args:
